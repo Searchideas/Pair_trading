@@ -36,7 +36,7 @@ class CCstudy:
         # Calculate daily returns
         returns_data = self.data.copy()
         for column in self.data.columns:
-            returns_data[f"{column}"] = np.log(1+returns_data[column].pct_change())
+            returns_data[f"{column}_return"] = np.log(1+returns_data[column].pct_change())
 
         # Drop original columns and the first row
         returns_data.drop(self.data.columns, axis=1, inplace=True)
@@ -80,11 +80,20 @@ class CCstudy:
             [(k[0], k[1], v[1]) for k, v in results.items()], 
             columns=['ticker1', 'ticker2', 'Cointegration result']
         )
+        Correlation = pd.melt(correlation_matrix.reset_index(), id_vars='index', var_name='columns', value_name='correlation')
+        Correlation.rename(columns={'index':'ticker1','columns':'ticker2'},inplace=True)
+        Correlation = Correlation[Correlation['ticker1'] != Correlation['ticker2']]
+        Correlation['ticker1'] = Correlation['ticker1'].str.removesuffix('_return')
+        Correlation['ticker2'] = Correlation['ticker2'].str.removesuffix('_return')
+        '''
+        # Assuming that 'correlation_table' is your DataFrame
         Correlation = pd.melt(correlation_matrix.reset_index(), id_vars='index', var_name='column', value_name='correlation')
 
         # Rename the 'index' column to 'row'
         Correlation  = Correlation.rename(columns={'index': 'ticker1','column':'ticker2'})
+'''     
+        #Merge tables
+        Cotable = results_df.merge(Correlation,left_on=['ticker1','ticker2'],right_on=['ticker1','ticker2'],how='left')
 
-
-        return Correlation, results_df
+        return Cotable
 
