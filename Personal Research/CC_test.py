@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import coint
 import itertools
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
+import seaborn as sns
 
 class CCstudy:
     def __init__(self, data):
@@ -20,11 +21,14 @@ class CCstudy:
         """
         Plot the correlation matrix as a heatmap.
         """
+        cmap = sns.diverging_palette(220, 10, as_cmap=True)
+        sns.clustermap(self.data.corr(), cmap=cmap, center=0);
+        """
         plt.figure(figsize=(10, 8))
         plt.imshow(self.data.corr(), cmap='coolwarm', interpolation='nearest')
         plt.title('Correlation Matrix')
         plt.colorbar()
-        plt.show()
+        plt.show()"""
 
     def return_tabulation(self):
         """
