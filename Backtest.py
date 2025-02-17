@@ -53,6 +53,9 @@ class Backtest:
             Price_df[str(ticker1) + "'s position"] = np.nan
             Price_df[str(ticker2) + "'s position"] = np.nan
             Price_df["Cash"] = np.nan
+            Price_df["Cash"][0] = 5000000  # Initialize Cash column with initial cash value
+            display(Price_df)
+
             
             ticker1_position = 0
             ticker2_position = 0
@@ -90,9 +93,9 @@ class Backtest:
                     Price_df.at[index, str(ticker2) + "'s position"] = ticker2_position
                     Price_df.at[index, "Cash"] = cash 
 
-                elif row['Signal'] not in ['Sell', 'Buy']:
+                elif row['Signal'] not in ['Sell', 'Buy'] and index != 0:
                     prev_row = Price_df.iloc[Price_df.index.get_loc(index) - 1]
-                    if float(prev_row['Spread']) * float(row['Spread']) < 0:
+                    if (float(prev_row['Spread']) > mean and float(row['Spread']) < mean) or (float(prev_row['Spread']) < mean and float(row['Spread']) > mean):
                         Price_df.at[index, str(ticker1) + "'s trade"] = -prev_row[str(ticker1) + "'s position"]
                         Price_df.at[index, str(ticker2) + "'s trade"] = -prev_row[str(ticker2) + "'s position"]
                         cash-= Price_df.at[index, str(ticker1) + "'s trade"]*row[ticker1] + Price_df.at[index, str(ticker2) + "'s trade"]*row[ticker2]
@@ -114,6 +117,9 @@ class Backtest:
             display(Price_df)
             Price_df = metric(Price_df)
             signal_plot(Price_df,hedge_ratio)
+            Pairs_label = str(ticker1)+"&"+str(ticker2)
+            filename = f"Price_df_{Pairs_label}.csv"
+            Price_df.to_csv(filename)
 
 
 def cashflow(Price_df):
