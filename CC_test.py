@@ -60,6 +60,8 @@ class CCstudy:
             model = LinearRegression()
             model.fit(log_prices1.values.reshape(-1, 1), log_prices2.values.reshape(-1, 1),)
             n = (model.coef_[0])[0]
+            # Calculate the R-squared value
+            rsq = model.score(log_prices1.values.reshape(-1, 1), log_prices2.values.reshape(-1, 1))
             # Calculate the spread
             spread = log_prices1 - n*log_prices2
         

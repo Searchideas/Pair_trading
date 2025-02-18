@@ -16,7 +16,7 @@ class Hedge_ratio():
             ticker1_data = np.log(self.merged_df[ticker1])
             ticker2_data = np.log(self.merged_df[ticker2])
             model = LinearRegression()
-            model.fit(ticker1_data.values.reshape(-1, 1), ticker2_data.values.reshape(-1, 1),)
+            model.fit(ticker2_data.values.reshape(-1, 1), ticker1_data.values.reshape(-1, 1),)
             r_sq = model.score(ticker1_data.values.reshape(-1, 1), ticker2_data.values.reshape(-1, 1))
             coefficient = 1 if np.round(model.coef_[0][0], 0) == 0 else np.round(model.coef_[0][0], 0)
             hedge_table.loc[i] = [ticker1,ticker2,r_sq,coefficient]
