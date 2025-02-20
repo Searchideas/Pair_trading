@@ -32,16 +32,14 @@ class DataRetrieval:
             pandas.DataFrame: A DataFrame containing the historical data.
         """
         try:
-            today = dt.datetime.today()
-            end_date = end_date if end_date else today
-            data = yf.download(self.ticker, start=start_date, end=end_date, progress=True)
+            end_date = end_date
+            data = yf.download(self.ticker, start=start_date, end=end_date, progress=True,auto_adjust=False,multi_level_index=False)
             data = data['Adj Close']
             data = data.rename(f"{self.ticker}")
             data.fillna(method='ffill', inplace=True)
-            data
             return data
         except Exception as e:
-            print("ticker error")
+            print(self.ticker+"ticker error")
         
     def merge_data(dataframes, suffixes=None, how="outer"):
         """
@@ -76,6 +74,7 @@ class DataRetrieval:
         """
         data_retrieval_instances = [DataRetrieval(ticker) for ticker in tickers if ticker is not None]
         dataframes = [instance.pull_data(start_date, end_date) for instance in data_retrieval_instances]
+        dataframes = [df for df in dataframes if df is not None]  # Remove None values
         merged_df = DataRetrieval.merge_data(dataframes, suffixes=[f"_{ticker}" for ticker in tickers])
         merged_df = merged_df.drop(merged_df.filter(regex='_').columns, axis=1)
         return merged_df

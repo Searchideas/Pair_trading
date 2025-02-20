@@ -10,24 +10,31 @@ class Spread:
         self.merged_df = merged_df
 
     def calculate_spread(self, ticker1, ticker2):
-        normalized_ticker1 = self.merged_df[ticker1] / self.merged_df[ticker1].iloc[0]
-        normalized_ticker2 = self.merged_df[ticker2] / self.merged_df[ticker2].iloc[0]
-        spread = normalized_ticker1 - normalized_ticker2
+        # Regression to find n 
+        ticker1 = self.merged_df[ticker1] 
+        ticker2 = self.merged_df[ticker2] 
+        log_prices1 = np.log(ticker1)
+        log_prices2 = np.log(ticker2)
+        model = LinearRegression()
+        model.fit(ticker1.values.reshape(-1, 1), ticker2.values.reshape(-1, 1),)
+        n = (model.coef_[0])[0]
+        # Calculate the spread
+        spread = log_prices1 - n*log_prices2
         return spread
 
     def compute_volatility(self, spread):
         vol = spread.std()
         mean = spread.mean()
-        upper = mean+2*vol
-        lower = mean-2*vol
+        upper = mean+1.75*vol
+        lower = mean-1.75*vol
         return vol, mean, upper,lower
 
     def plot_spread(self, spread, ticker1, ticker2, mean, upper,lower):
         plt.figure(figsize=(10, 6))
         plt.plot(spread)
         plt.axhline(y=mean, linestyle='-')
-        plt.axhline(y=upper, linestyle='--')
-        plt.axhline(y=lower, linestyle='--')
+        plt.axhline(y=upper, linestyle='--', c='red')
+        plt.axhline(y=lower, linestyle='--', c='red')
         plt.title('Spread between {} and {}'.format(ticker1, ticker2))
         plt.xlabel('Time')
         plt.ylabel('Spread')
