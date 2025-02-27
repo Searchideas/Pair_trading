@@ -6,6 +6,7 @@ from Spread import Spread
 import matplotlib.pyplot as plt
 import scipy.optimize as optimize
 from IPython.display import display
+import pyfolio as pf
 
 
 class Backtest:
@@ -121,7 +122,7 @@ class Backtest:
 
     def metric(self,Price_df):
         Price_df['returns'] = Price_df['Portfolio Value'].pct_change()
-        Price_df['cum returns'] = (1 + Price_df['returns']).cumprod() - 1
+        '''Price_df['cum returns'] = (1 + Price_df['returns']).cumprod() - 1
         # Plot cumulative returns
         fig, ax = plt.subplots(figsize=(12, 6))
         ax.plot(Price_df.index, Price_df['cum returns'], label='Portfolio')
@@ -150,8 +151,9 @@ class Backtest:
         # Max drawdown
         cumlative_max = Price_df['cum returns'].cummax()
         drawdown = (Price_df['cum returns'] - cumlative_max) / cumlative_max
-        print(f'max drawdown: {min(drawdown[1:])*100:.2f}%')
-        return Price_df
+        print(f'max drawdown: {min(drawdown[1:])*100:.2f}%')'''
+        performance = pf.create_simple_tear_sheet(Price_df['returns'])
+        return performance
         
     def signal_plot(self,Price_df, hedge_ratio):
         Columns = Price_df.columns
